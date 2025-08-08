@@ -57,7 +57,6 @@
         }
       ],
       "expo-web-browser",
-      "expo-facebook",
       "expo-secure-store",
       "expo-video"
     ],
