@@ -1,10 +1,10 @@
 {
   "expo": {
-    "name": "tales-from-the-north-pole",
-    "slug": "tales-from-the-north-pole",
+    "name": "The Elf Chronicles",
+    "slug": "the-elf-chronicles",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/splash.png",
     "scheme": "talesfromthenorthpole",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -24,15 +24,28 @@
           },
           {
             "SKAdNetworkIdentifier": "n38lu8286q.skadnetwork"
+          },
+          {
+            "SKAdNetworkIdentifier": "v9wttpbfk9.skadnetwork"
+          },
+          {
+            "SKAdNetworkIdentifier": "n38lu8286q.skadnetwork"
+          },
+          {
+            "SKAdNetworkIdentifier": "v9wttpbfk9.skadnetwork"
+          },
+          {
+            "SKAdNetworkIdentifier": "n38lu8286q.skadnetwork"
           }
-        ]
+        ],
+        "ITSAppUsesNonExemptEncryption": false
       },
       "bundleIdentifier": "com.arbab001.ElfSaga"
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "foregroundImage": "./assets/images/splash.png",
+        "backgroundColor": "#066863"
       },
       "edgeToEdgeEnabled": true,
       "package": "com.arbab001.ElfSaga"
@@ -66,8 +79,9 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "0d9b90b3-ec54-454b-b78c-1c1caf7bcd3a"
+        "projectId": "ef709be6-4ee5-452a-bbdf-f742a06e8334"
       }
-    }
+    },
+    "owner": "arbab001"
   }
 }

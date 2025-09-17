@@ -11,12 +11,15 @@ import {
     Image,
     KeyboardAvoidingView,
     Platform,
+    Pressable,
+    ScrollView,
     StyleSheet,
     Text,
     TextInput,
     TouchableOpacity,
     View
 } from 'react-native';
+// import { ScrollView } from 'react-native-gesture-handler';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const { width, height } = Dimensions.get('window');
@@ -49,87 +52,104 @@ export default function LoginScreen() {
                 contentFit="cover"
             >
                 <BlurView intensity={80} tint="dark" style={StyleSheet.absoluteFill} />
-            </ImageBackground>
 
-            <KeyboardAvoidingView
-                behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-                style={styles.innerContainer}
-            >
-                <Text style={styles.title}>Welcome Back 👋</Text>
-                <Text style={styles.subtitle}>Login to continue your journey</Text>
+                <ScrollView contentContainerStyle={styles.innerContainer1}>
 
-                <Image
-                    source={require('../assets/images/splash.png')}
-                    style={styles.logo}
-                    resizeMode="contain"
-                />
+                    <KeyboardAvoidingView
+                        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+                        style={styles.innerContainer}
+                    >
+                        <Text style={styles.title}>Welcome Back 👋</Text>
+                        <Text style={styles.subtitle}>Login to continue your journey</Text>
 
-                {/* Email Input */}
-                <View style={styles.inputContainer}>
-                    <TextInput
-                        placeholder="Email"
-                        placeholderTextColor="#aaa"
-                        style={styles.input}
-                        keyboardType="email-address"
-                        autoCapitalize="none"
-                        value={email}
-                        onChangeText={setEmail} // Update email state
-                    />
-
-                    {/* Password Input */}
-                    <View style={styles.passwordWrapper}>
-                        <TextInput
-                            placeholder="Password"
-                            placeholderTextColor="#aaa"
-                            secureTextEntry={!showPassword}
-                            style={[styles.input, { flex: 1, marginBottom: 0 }]}
-                            value={password} // Bind password state
-                            onChangeText={setPassword} // Update password state
+                        <Image
+                            source={require('../assets/images/splash.png')}
+                            style={styles.logo}
+                            resizeMode="contain"
                         />
-                        <TouchableOpacity
-                            onPress={() => setShowPassword((prev) => !prev)} // Toggle password visibility
-                            style={styles.eyeIconWrapper}
-                        >
-                            <Ionicons
-                                name={showPassword ? 'eye' : 'eye-off'}
-                                size={22}
-                                color="#aaa"
+
+                        {/* Email Input */}
+                        <View style={styles.inputContainer}>
+                            <TextInput
+                                placeholder="Email"
+                                placeholderTextColor="#aaa"
+                                style={styles.input}
+                                keyboardType="email-address"
+                                autoCapitalize="none"
+                                value={email}
+                                onChangeText={setEmail} // Update email state
                             />
+
+                            {/* Password Input */}
+                            <View style={styles.passwordWrapper}>
+                                <TextInput
+                                    placeholder="Password"
+                                    placeholderTextColor="#aaa"
+                                    secureTextEntry={!showPassword}
+                                    style={[styles.input, { flex: 1, marginBottom: 0 }]}
+                                    value={password} // Bind password state
+                                    onChangeText={setPassword} // Update password state
+                                />
+                                <TouchableOpacity
+                                    onPress={() => setShowPassword((prev) => !prev)} // Toggle password visibility
+                                    style={styles.eyeIconWrapper}
+                                >
+                                    <Ionicons
+                                        name={showPassword ? 'eye' : 'eye-off'}
+                                        size={22}
+                                        color="#aaa"
+                                    />
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+
+                        {/* Error Message */}
+                        {error ? <Text style={styles.errorText}>{error}</Text> : null}
+
+                        {/* Forgot Password Button */}
+                        <TouchableOpacity style={styles.forgotBtn}>
+                            <Text style={styles.forgot}>Forgot Password?</Text>
                         </TouchableOpacity>
-                    </View>
-                </View>
 
-                {/* Error Message */}
-                {error ? <Text style={styles.errorText}>{error}</Text> : null}
+                        {/* Sign In Button */}
+                        <TouchableOpacity
+                            style={styles.signInBtn}
+                            onPress={handleLogin} // Trigger login when pressed
+                        >
+                            <Text style={styles.btnText}>Sign In</Text>
+                        </TouchableOpacity>
 
-                {/* Forgot Password Button */}
-                <TouchableOpacity style={styles.forgotBtn}>
-                    <Text style={styles.forgot}>Forgot Password?</Text>
-                </TouchableOpacity>
+                        {/* Create New Account Button */}
+                        <TouchableOpacity
+                            style={styles.secondaryBtn}
+                            onPress={() => router.push('/signup' as never)} // Navigate to sign up screen
+                        >
+                            <Text style={styles.secondaryText}>Create New Account</Text>
+                        </TouchableOpacity>
 
-                {/* Sign In Button */}
-                <TouchableOpacity
-                    style={styles.signInBtn}
-                    onPress={handleLogin} // Trigger login when pressed
-                >
-                    <Text style={styles.btnText}>Sign In</Text>
-                </TouchableOpacity>
+                        {/* Terms and Privacy Policy */}
+                        <View style={styles.termsContainer}>
+                            <Text style={styles.terms}>
+                                By signing in, you agree to our{' '}
+                            </Text>
+                            <Pressable
+                                onPress={() => router.push('/legal?type=terms')}
+                                hitSlop={8}
+                            >
+                                <Text style={styles.link}>Terms</Text>
+                            </Pressable>
+                            <Text style={styles.terms}> & </Text>
+                            <Pressable
+                                onPress={() => router.push('/legal?type=privacy')}
+                                hitSlop={8}
+                            >
+                                <Text style={styles.link}>Privacy Policy</Text>
+                            </Pressable>
+                        </View>
+                    </KeyboardAvoidingView>
+                </ScrollView>
 
-                {/* Create New Account Button */}
-                <TouchableOpacity
-                    style={styles.secondaryBtn}
-                    onPress={() => router.push('/signup' as never)} // Navigate to sign up screen
-                >
-                    <Text style={styles.secondaryText}>Create New Account</Text>
-                </TouchableOpacity>
-
-                {/* Terms and Privacy Policy */}
-                <Text style={styles.terms}>
-                    By signing in, you agree to our{' '}
-                    <Text style={styles.link}>Terms</Text> &{' '}
-                    <Text style={styles.link}>Privacy Policy</Text>
-                </Text>
-            </KeyboardAvoidingView>
+            </ImageBackground>
         </SafeAreaView>
     );
 }
@@ -137,18 +157,26 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#000',
+        // width,
+        // height: height + 50,
+        // backgroundColor: 'red',
+        backgroundColor: '#000'
     },
     background: {
-        width,
-        height,
-        position: 'absolute',
+        width: "100%",
+        height: "100%",
     },
     innerContainer: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
         paddingHorizontal: 24,
+    },
+    innerContainer1: {
+        flex: 1,
+        // justifyContent: 'center',
+        // alignItems: 'center',
+        // paddingHorizontal: 24,
     },
     title: {
         fontSize: 34,
@@ -242,15 +270,23 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: '600',
     },
+    termsContainer: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        justifyContent: 'center',
+        alignItems: 'center',
+        paddingHorizontal: 10,
+    },
     terms: {
         color: '#ccc',
         fontSize: 13,
         textAlign: 'center',
-        paddingHorizontal: 10,
     },
     link: {
         color: '#23d18b',
         fontWeight: '600',
+        fontSize: 13,
+        textDecorationLine: 'underline',
     },
     errorText: {
         color: 'red',

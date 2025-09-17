@@ -1,94 +1,103 @@
-// import { Redirect, Stack } from 'expo-router';
-// import React from 'react';
-
-// // import { HapticTab } from '@/components/HapticTab';
-// // import { IconSymbol } from '@/components/ui/IconSymbol';
-// // import TabBarBackground from '@/components/ui/TabBarBackground';
-// // import { Colors } from '@/constants/Colors';
-// // import { useColorScheme } from '@/hooks/useColorScheme';
-// import { useAuthStore } from '@/utils/authStore';
-// import { StatusBar } from 'expo-status-bar';
-
-// export default function ProtectedLayout() {
-//   const {
-//     isLoggedIn,
-//   } = useAuthStore();
-//   // const isLoggedIn = true;
-//   // const colorScheme = useColorScheme();
-//   // useEffect(() => {
-//   //   const prepareApp = async () => {
-//   //     // const isLoggedIn = await AsyncStorage.getItem('isLoggedIn');
-//   //     console.log(isLoggedIn)
-
-//   //     if (isLoggedIn === null || !isLoggedIn) {
-//   //       // <Redirect href="(tabs)" />
-//   //       <Redirect href="/(auth)/login" />
-//   //     }
-
-
-//   //   };
-
-//   //   prepareApp();
-//   // }, []);
-//   // useEffect(() => {
-//   //   if (!isLoggedIn) {
-//   //     // <Redirect href="(tabs)" />
-//   //     <Redirect href="/auth/authentication/test" />
-//   //   }
-//   // }, [])
-
-//   if (!isLoggedIn) {
-//     // <Redirect href="(tabs)" />
-//     return <Redirect href={"/login" as never} />
-//   }
-
-
-//   return (
-//     <>
-//       <StatusBar style="auto" />
-//       <Stack>
-//         <Stack.Screen name="index" />
-//       </Stack>
-//     </>
-//   );
-// }
-
-
+// app/(protected)/_layout.tsx
 'use client';
+
 import { useAuthStore } from '@/utils/authStore';
 import { Ionicons } from '@expo/vector-icons';
+import {
+  DrawerContentScrollView,
+  DrawerItem,
+  DrawerItemList,
+  type DrawerContentComponentProps,
+} from '@react-navigation/drawer';
 import { Redirect, useRouter } from 'expo-router';
 import { Drawer } from 'expo-router/drawer';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import * as React from 'react';
+import { ImageBackground, StyleSheet, Text, View } from 'react-native';
 
-export default function ProtectedLayout() {
-  const { isLoggedIn, logOut } = useAuthStore();
+// 🔹 local image (put a jpg/png in your assets folder)
+const BG = require('@/assets/images/splash-bg.png');
+// // or remote fallback:
+// const BG = { uri: 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=80&w=1200' };
+
+function CustomDrawerContent(props: DrawerContentComponentProps) {
   const router = useRouter();
+  const { logOut } = useAuthStore();
 
-  // If the user is not logged in, redirect to the login screen
-  if (!isLoggedIn) {
-    return <Redirect href="/login" />;
-  }
-
-  const handleLogout = () => {
-    // logOut(); // Clear Zustand auth store
-    // router.replace('/login'); // Redirect to login
-    console.log("first")
+  const onLogout = () => {
+    logOut();
+    router.replace('/login');
   };
 
   return (
+    <ImageBackground source={BG} style={styles.bg} resizeMode="cover">
+      <View style={styles.bgOverlay} />
+
+      <DrawerContentScrollView
+        {...props}
+        contentContainerStyle={styles.scrollContainer}
+      >
+        {/* Pretty header area */}
+        <View style={styles.header}>
+          {/* <View style={styles.avatar} /> */}
+          <View style={{ flex: 1 }}>
+            <Text style={styles.name}>Welcome 👋</Text>
+            <Text style={styles.sub}>Have a great session</Text>
+          </View>
+        </View>
+
+        {/* Auto-renders your <Drawer.Screen/> items */}
+        <View style={{ flexGrow: 1 }}>
+          <DrawerItemList {...props} />
+        </View>
+
+        {/* Sticky bottom action */}
+        <View style={styles.footer}>
+          <DrawerItem
+            label="Logout"
+            onPress={onLogout}
+            icon={({ color, size }) => (
+              <Ionicons name="log-out-outline" size={size} color={color} />
+            )}
+            style={styles.logoutItem}
+            labelStyle={styles.logoutLabel}
+          />
+        </View>
+      </DrawerContentScrollView>
+    </ImageBackground>
+  );
+}
+
+export default function ProtectedLayout() {
+  const { isLoggedIn } = useAuthStore();
+
+  if (!isLoggedIn) return <Redirect href="/login" />;
+
+  return (
     <Drawer
+      // global look & feel
       screenOptions={{
-        headerStyle: {
-          backgroundColor: '#066863',
-        },
+        // Header
         headerTintColor: '#fff',
-        drawerActiveTintColor: '#066863',
+        headerTitleStyle: { fontWeight: '600' },
+        headerBackground: () => (
+          <ImageBackground source={BG} style={{ flex: 1 }} blurRadius={8} />
+        ),
+
+        // Drawer colors integrate with the background image
+        drawerStyle: { backgroundColor: 'transparent' },
+        drawerActiveTintColor: '#ffffff',
+        drawerInactiveTintColor: 'rgba(255,255,255,0.8)',
+        drawerLabelStyle: { fontSize: 15, fontWeight: '500' },
+        drawerItemStyle: { borderRadius: 12, marginHorizontal: 12 },
+
+        // Scene (screen) background behind content
+        // sceneContainerStyle: { backgroundColor: '#0b132b' },
       }}
+      drawerContent={(p) => <CustomDrawerContent {...p} />}
     >
-      {/* Home Screen */}
+      {/* Home */}
       <Drawer.Screen
-        name="home"
+        name="index"
         options={{
           title: 'Home',
           drawerIcon: ({ color, size }) => (
@@ -96,8 +105,42 @@ export default function ProtectedLayout() {
           ),
         }}
       />
+      <Drawer.Screen
+        name="aboutAuthor"
+        options={{
+          title: 'About Author',
+          drawerIcon: ({ color, size }) => (
+            <Ionicons name="ribbon-outline" size={size} color={color} />
+            // nice alternatives: "information-circle-outline", "book-outline", "sparkles-outline"
+          ),
+        }}
+      />
+      <Drawer.Screen
+        name="subscribe" // if your file is app/(protected)/subscribe/index.tsx
+        // name="subscribe"     // use this instead if your file is app/(protected)/subscribe.tsx
+        options={{
+          title: 'Subscription',
+          drawerIcon: ({ color, size }) => (
+            <Ionicons name="card-outline" size={size} color={color} />
+          ),
+        }}
+      />
 
-      {/* Profile Screen */}
+
+      <Drawer.Screen
+        name="account"
+        options={{
+          title: 'Delete Account',
+          drawerIcon: ({ color, size }) => (
+            // <Ionicons name="trash-outline" size={size} color={color} />
+
+            <Ionicons name="trash-outline" size={size} color={"red"} />
+          ),
+        }}
+      />
+
+      {/* Example extra screens (uncomment when you add them) */}
+      {/*
       <Drawer.Screen
         name="profile"
         options={{
@@ -107,34 +150,67 @@ export default function ProtectedLayout() {
           ),
         }}
       />
-
-      {/* Logout Button in Drawer */}
-      <View style={styles.drawerButtonContainer}>
-        <TouchableOpacity onPress={handleLogout} style={styles.drawerButton}>
-          <Ionicons name="log-out-outline" size={20} color="#fff" />
-          <Text style={styles.buttonText}>Logout</Text>
-        </TouchableOpacity>
-      </View>
+      <Drawer.Screen
+        name="settings"
+        options={{
+          title: 'Settings',
+          drawerIcon: ({ color, size }) => (
+            <Ionicons name="settings-outline" size={size} color={color} />
+          ),
+        }}
+      />
+      */}
     </Drawer>
   );
 }
 
 const styles = StyleSheet.create({
-  drawerButtonContainer: {
-    marginTop: 'auto', // Push the logout button to the bottom
-    marginBottom: 20, // Add space from the bottom
+  bg: { flex: 1 },
+  bgOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(6, 104, 99, 0.45)', // teal glass overlay for contrast
   },
-  drawerButton: {
+  scrollContainer: {
+    flexGrow: 1,
+    paddingTop: 0,
+    paddingBottom: 12,
+  },
+  header: {
+    paddingHorizontal: 16,
+    paddingTop: 48,
+    paddingBottom: 24,
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 10,
-    backgroundColor: '#069999', // Same color as the header
-    borderRadius: 5,
-    marginHorizontal: 16,
+    gap: 12,
   },
-  buttonText: {
+  avatar: {
+    height: 48,
+    width: 48,
+    borderRadius: 24,
+    backgroundColor: 'rgba(255,255,255,0.25)',
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: 'rgba(255,255,255,0.35)',
+  },
+  name: {
     color: '#fff',
-    marginLeft: 8,
-    fontSize: 16,
+    fontSize: 18,
+    fontWeight: '700',
+    letterSpacing: 0.3,
+  },
+  sub: {
+    color: 'rgba(255,255,255,0.85)',
+    marginTop: 2,
+  },
+  footer: {
+    marginTop: 'auto',
+    paddingHorizontal: 4,
+  },
+  logoutItem: {
+    borderRadius: 12,
+    marginHorizontal: 8,
+    backgroundColor: 'rgba(0,0,0,0.18)',
+  },
+  logoutLabel: {
+    fontWeight: '600',
   },
 });

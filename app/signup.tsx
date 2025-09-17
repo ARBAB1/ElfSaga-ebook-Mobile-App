@@ -3,23 +3,24 @@ import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Google from 'expo-auth-session/providers/google';
 import { BlurView } from 'expo-blur';
-import * as Facebook from 'expo-facebook';
+
 import { ImageBackground } from 'expo-image';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import * as WebBrowser from 'expo-web-browser';
 import React, { useEffect, useState } from 'react';
 import {
-    Alert,
     Dimensions,
     Image,
     KeyboardAvoidingView,
     Platform,
+    Pressable,
+    ScrollView,
     StyleSheet,
     Text,
     TextInput,
     TouchableOpacity,
-    View,
+    View
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -53,24 +54,7 @@ export default function SignupScreen() {
 
     const handleGoogleSignup = () => promptAsync();
 
-    const handleFacebookSignup = async () => {
-        try {
-            await Facebook.initializeAsync({ appId: '<YOUR_FACEBOOK_APP_ID>' });
-            const result = await Facebook.logInWithReadPermissionsAsync({
-                permissions: ['public_profile', 'email'],
-            });
 
-            if (result.type === 'success') {
-                await AsyncStorage.setItem('isLoggedIn', 'true');
-                await AsyncStorage.setItem('facebook_token', result.token);
-                // router.replace('/home'); // Navigate to home after successful signup
-            } else {
-                Alert.alert('Login Cancelled');
-            }
-        } catch (error: any) {
-            Alert.alert('Facebook Login Error', error.message);
-        }
-    };
 
     // Handle form-based signup
     const handleSignup = async () => {
@@ -104,109 +88,120 @@ export default function SignupScreen() {
                 contentFit="cover"
             >
                 <BlurView intensity={80} tint="dark" style={StyleSheet.absoluteFill} />
+
+                <ScrollView contentContainerStyle={styles.innerContainer1}>
+                    <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+                        <Ionicons name="chevron-back" size={28} color="#fff" />
+                    </TouchableOpacity>
+
+                    <KeyboardAvoidingView
+                        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+                        style={styles.innerContainer}
+                    >
+                        <Text style={styles.title}>Create Account ✨</Text>
+                        <Text style={styles.subtitle}>Sign up to begin your adventure</Text>
+
+                        <Image
+                            source={require('../assets/images/splash.png')}
+                            style={styles.logo}
+                            resizeMode="contain"
+                        />
+
+                        <View style={styles.inputContainer}>
+                            <TextInput
+                                placeholder="Email"
+                                placeholderTextColor="#aaa"
+                                style={styles.input}
+                                keyboardType="email-address"
+                                autoCapitalize="none"
+                                value={email}
+                                onChangeText={setEmail}
+                            />
+                            <View style={styles.passwordField}>
+                                <TextInput
+                                    placeholder="Password"
+                                    placeholderTextColor="#aaa"
+                                    secureTextEntry={!passwordVisible}
+                                    style={[styles.input, { flex: 1, marginBottom: 0 }]}
+                                    value={password}
+                                    onChangeText={setPassword}
+                                />
+                                <TouchableOpacity
+                                    onPress={() => setPasswordVisible(!passwordVisible)}
+                                    style={styles.eyeIcon}
+                                >
+                                    <Ionicons name={passwordVisible ? 'eye' : 'eye-off'} size={22} color="#aaa" />
+                                </TouchableOpacity>
+                            </View>
+                            <View style={styles.passwordField}>
+                                <TextInput
+                                    placeholder="Confirm Password"
+                                    placeholderTextColor="#aaa"
+                                    secureTextEntry={!passwordVisible}
+                                    style={[styles.input, { flex: 1, marginBottom: 0 }]}
+                                    value={confirmPassword}
+                                    onChangeText={setConfirmPassword}
+                                />
+                                <TouchableOpacity
+                                    onPress={() => setPasswordVisible(!passwordVisible)}
+                                    style={styles.eyeIcon}
+                                >
+                                    <Ionicons name={passwordVisible ? 'eye' : 'eye-off'} size={22} color="#aaa" />
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+
+                        {error ? <Text style={styles.errorText}>{error}</Text> : null}
+
+                        <TouchableOpacity style={styles.signInBtn} onPress={handleSignup}>
+                            <Text style={styles.btnText}>Sign Up</Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity
+                            style={styles.secondaryBtn}
+                            onPress={() => router.replace('/login')}
+                        >
+                            <Text style={styles.secondaryText}>Already have an account? Login</Text>
+                        </TouchableOpacity>
+
+                        {/* Social media buttons */}
+
+
+                        <View style={styles.termsContainer}>
+                            <Text style={styles.terms}>
+                                By signing up, you agree to our{' '}
+                            </Text>
+                            <Pressable
+                                onPress={() => router.push('/legal?type=terms')}
+                                hitSlop={8}
+                            >
+                                <Text style={styles.link}>Terms</Text>
+                            </Pressable>
+                            <Text style={styles.terms}> & </Text>
+                            <Pressable
+                                onPress={() => router.push('/legal?type=privacy')}
+                                hitSlop={8}
+                            >
+                                <Text style={styles.link}>Privacy Policy</Text>
+                            </Pressable>
+                        </View>
+                    </KeyboardAvoidingView>
+                </ScrollView>
+
             </ImageBackground>
-
-            <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-                <Ionicons name="chevron-back" size={28} color="#fff" />
-            </TouchableOpacity>
-
-            <KeyboardAvoidingView
-                behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-                style={styles.innerContainer}
-            >
-                <Text style={styles.title}>Create Account ✨</Text>
-                <Text style={styles.subtitle}>Sign up to begin your adventure</Text>
-
-                <Image
-                    source={require('../assets/images/splash.png')}
-                    style={styles.logo}
-                    resizeMode="contain"
-                />
-
-                <View style={styles.inputContainer}>
-                    <TextInput
-                        placeholder="Email"
-                        placeholderTextColor="#aaa"
-                        style={styles.input}
-                        keyboardType="email-address"
-                        autoCapitalize="none"
-                        value={email}
-                        onChangeText={setEmail}
-                    />
-                    <View style={styles.passwordField}>
-                        <TextInput
-                            placeholder="Password"
-                            placeholderTextColor="#aaa"
-                            secureTextEntry={!passwordVisible}
-                            style={[styles.input, { flex: 1, marginBottom: 0 }]}
-                            value={password}
-                            onChangeText={setPassword}
-                        />
-                        <TouchableOpacity
-                            onPress={() => setPasswordVisible(!passwordVisible)}
-                            style={styles.eyeIcon}
-                        >
-                            <Ionicons name={passwordVisible ? 'eye' : 'eye-off'} size={22} color="#aaa" />
-                        </TouchableOpacity>
-                    </View>
-                    <View style={styles.passwordField}>
-                        <TextInput
-                            placeholder="Confirm Password"
-                            placeholderTextColor="#aaa"
-                            secureTextEntry={!passwordVisible}
-                            style={[styles.input, { flex: 1, marginBottom: 0 }]}
-                            value={confirmPassword}
-                            onChangeText={setConfirmPassword}
-                        />
-                        <TouchableOpacity
-                            onPress={() => setPasswordVisible(!passwordVisible)}
-                            style={styles.eyeIcon}
-                        >
-                            <Ionicons name={passwordVisible ? 'eye' : 'eye-off'} size={22} color="#aaa" />
-                        </TouchableOpacity>
-                    </View>
-                </View>
-
-                {error ? <Text style={styles.errorText}>{error}</Text> : null}
-
-                <TouchableOpacity style={styles.signInBtn} onPress={handleSignup}>
-                    <Text style={styles.btnText}>Sign Up</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                    style={styles.secondaryBtn}
-                    onPress={() => router.replace('/login')}
-                >
-                    <Text style={styles.secondaryText}>Already have an account? Login</Text>
-                </TouchableOpacity>
-
-                {/* Social media buttons */}
-                <Text style={styles.or}>─ OR ─</Text>
-
-                <View style={styles.socialContainer}>
-                    <TouchableOpacity style={styles.iconBtn} onPress={handleGoogleSignup}>
-                        <Text style={styles.icon}>G</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.iconBtn} onPress={handleFacebookSignup}>
-                        <Text style={styles.icon}>f</Text>
-                    </TouchableOpacity>
-                </View>
-
-                <Text style={styles.terms}>
-                    By signing up, you agree to our <Text style={styles.link}>Terms</Text> &{' '}
-                    <Text style={styles.link}>Privacy Policy</Text>
-                </Text>
-            </KeyboardAvoidingView>
         </SafeAreaView>
     );
 }
 
 const styles = StyleSheet.create({
     container: { flex: 1, backgroundColor: '#000' },
-    background: { width, height, position: 'absolute' },
+    background: {
+        width: "100%",
+        height: "100%",
+    },
     backButton: {
         position: 'absolute',
-        top: 50,
+        top: 25,
         left: 24,
         zIndex: 10,
     },
@@ -215,6 +210,12 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         paddingHorizontal: 24,
+    },
+    innerContainer1: {
+        flex: 1,
+        // justifyContent: 'center',
+        // alignItems: 'center',
+        // paddingHorizontal: 24,
     },
     title: {
         fontSize: 34,
@@ -291,13 +292,24 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     icon: { fontSize: 20, fontWeight: 'bold' },
+    termsContainer: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        justifyContent: 'center',
+        alignItems: 'center',
+        paddingHorizontal: 10,
+    },
     terms: {
         color: '#ccc',
         fontSize: 13,
         textAlign: 'center',
-        paddingHorizontal: 10,
     },
-    link: { color: '#23d18b', fontWeight: '600' },
+    link: {
+        color: '#23d18b',
+        fontWeight: '600',
+        fontSize: 13,
+        textDecorationLine: 'underline',
+    },
     errorText: {
         color: 'red',
         marginBottom: 10,

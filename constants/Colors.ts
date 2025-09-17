@@ -3,6 +3,12 @@
  * There are many other ways to style your app. For example, [Nativewind](https://www.nativewind.dev/), [Tamagui](https://tamagui.dev/), [unistyles](https://reactnativeunistyles.vercel.app), etc.
  */
 
+import { Dimensions } from 'react-native';
+
+export const SPACING = 20;
+export const { height: SCREEN_HEIGHT, width: SCREEN_WIDTH } = Dimensions.get('window');
+export const VIDEO_HEIGHT = SCREEN_HEIGHT - SPACING - 100;
+
 const tintColorLight = '#0a7ea4';
 const tintColorDark = '#fff';
 
